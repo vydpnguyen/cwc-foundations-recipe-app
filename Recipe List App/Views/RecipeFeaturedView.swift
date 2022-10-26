@@ -68,8 +68,6 @@ struct RecipeFeaturedView: View {
             .padding([.leading, .bottom], 10)
         }
         
-        
-        
     }
 }
 
