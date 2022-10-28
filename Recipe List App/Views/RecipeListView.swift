@@ -40,7 +40,6 @@ struct RecipeListView: View {
                                         Text(r.name)
                                             .foregroundColor(.black)
                                     }
-                                    
                                 })
                         }
                     }
@@ -49,8 +48,7 @@ struct RecipeListView: View {
             // Hide the title
             .navigationBarHidden(true)
             .padding()
-            
-            
+    
         }
     }
 }

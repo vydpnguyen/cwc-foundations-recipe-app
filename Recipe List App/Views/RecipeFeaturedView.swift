@@ -10,6 +10,7 @@ import SwiftUI
 struct RecipeFeaturedView: View {
     
     @EnvironmentObject var model:RecipeModel
+    @State var isDetailViewShowing = false
     
     var body: some View {
         
@@ -23,27 +24,40 @@ struct RecipeFeaturedView: View {
             GeometryReader { geo in
                 
                 TabView {
-                    // Only show recipes that should be featured
+                    
                     ForEach(0..<model.recipes.count) { i in
                         
+                        // Only show recipes that should be featured
                         if model.recipes[i].featured {
-                            // Recipe card
-                            ZStack {
-                                Rectangle()
-                                    .foregroundColor(.white)
-        
-                                VStack(spacing: 0) {
-                                    Image(model.recipes[i].image)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .clipped()
+                            Button (action: {
+                                // When the button is tap, this will become true
+                                self.isDetailViewShowing = true
+                            },
+                            label: {
+                                // Recipe card
+                                ZStack {
+                                    Rectangle()
+                                        .foregroundColor(.white)
                                     
-                                    Text(model.recipes[i].name)
-                                        .fontWeight(.bold)
-                                        .padding(5)
+                                    VStack(spacing: 0) {
+                                        Image(model.recipes[i].image)
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                            .clipped()
+                                        
+                                        Text(model.recipes[i].name)
+                                            .fontWeight(.bold)
+                                            .padding(5)
+                                    }
+                                    
                                 }
+                            })
+                            .sheet(isPresented: $isDetailViewShowing) {
+                                // Show the RecipeDetailView
+                                RecipeDetailView(recipe: model.recipes[i])
                                 
                             }
+                            .buttonStyle(PlainButtonStyle())
                             .frame(width: geo.size.width-40, height: geo.size.height-100, alignment: .center)
                             .cornerRadius(20)
                             .shadow(radius: 10)
