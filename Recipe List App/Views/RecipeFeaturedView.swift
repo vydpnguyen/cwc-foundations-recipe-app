@@ -11,57 +11,63 @@ struct RecipeFeaturedView: View {
     
     @EnvironmentObject var model:RecipeModel
     @State var isDetailViewShowing = false
+    @State var tabSelectionIndex = 0
     
     var body: some View {
         
+        let featuredRecipes = model.recipes.filter({ $0.featured })
+        /*
+         let featuredRecipe = model.recipes.filter { r in
+         if r.featured == true {
+         return
+         }
+         }
+         */
+        
         VStack(alignment: .leading, spacing: 0) {
-            Text("Featured")
+            
+            Text("Featured Recipes")
                 .fontWeight(.bold)
                 .padding(.leading)
                 .padding(.top, 20)
-                .font(.largeTitle)
-                
+                .font(Font.custom("Avenir Heavy", size: 30))
+            
             GeometryReader { geo in
                 
-                TabView {
+                TabView(selection: $tabSelectionIndex) {
                     
-                    ForEach(0..<model.recipes.count) { i in
+                    ForEach(0..<featuredRecipes.count) { i in
                         
-                        // Only show recipes that should be featured
-                        if model.recipes[i].featured {
-                            Button (action: {
-                                // When the button is tap, this will become true
-                                self.isDetailViewShowing = true
-                            },
-                            label: {
-                                // Recipe card
-                                ZStack {
-                                    Rectangle()
-                                        .foregroundColor(.white)
+                        Button (action: {
+                            // When the button is tap, this will become true
+                            self.isDetailViewShowing = true
+                        },
+                                label: {
+                            // Recipe card
+                            ZStack {
+                                Rectangle()
+                                    .foregroundColor(.white)
+                                
+                                VStack(spacing: 0) {
+                                    Image(featuredRecipes[i].image)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .clipped()
                                     
-                                    VStack(spacing: 0) {
-                                        Image(model.recipes[i].image)
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .clipped()
-                                        
-                                        Text(model.recipes[i].name)
-                                            .fontWeight(.bold)
-                                            .padding(5)
-                                    }
-                                    
+                                    Text(featuredRecipes[i].name)
+                                        .fontWeight(.bold)
+                                        .padding(5)
+                                        .font(Font.custom("Avenir", size: 20))
                                 }
-                            })
-                            .sheet(isPresented: $isDetailViewShowing) {
-                                // Show the RecipeDetailView
-                                RecipeDetailView(recipe: model.recipes[i])
                                 
                             }
-                            .buttonStyle(PlainButtonStyle())
-                            .frame(width: geo.size.width-40, height: geo.size.height-100, alignment: .center)
-                            .cornerRadius(20)
-                            .shadow(radius: 10)
-                        }
+                        })
+                        .tag(i)
+                        .buttonStyle(PlainButtonStyle())
+                        .frame(width: geo.size.width-40, height: geo.size.height-100, alignment: .center)
+                        .cornerRadius(20)
+                        .shadow(radius: 10)
+                        
                         
                     }
                 }
@@ -73,15 +79,20 @@ struct RecipeFeaturedView: View {
             
             VStack(alignment: .leading, spacing: 10) {
                 Text("Preparation Time")
-                    .font(.headline)
-                Text("1 hour")
+                    .font(Font.custom("Avenir Heavy", size: 20))
+                Text(featuredRecipes[tabSelectionIndex].prepTime)
+                    .font(Font.custom("Avenir", size: 16))
                 Text("Highlights")
-                    .font(.headline)
-                Text("Vegan")
+                    .font(Font.custom("Avenir Heavy", size: 20))
+                RecipeHighlights(highlights: model.recipes[tabSelectionIndex].highlights)
+                    .font(Font.custom("Avenir", size: 16))
             }
             .padding([.leading, .bottom], 10)
         }
-        
+        .sheet(isPresented: $isDetailViewShowing) {
+            // Show the RecipeDetailView
+            RecipeDetailView(recipe: featuredRecipes[tabSelectionIndex])
+        }
     }
 }
 
